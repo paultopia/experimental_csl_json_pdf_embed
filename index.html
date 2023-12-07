@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embed and Extract JSON Metadata in PDF</title>
+    <!-- Import PDF-lib from a CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.15.0/dist/pdf-lib.min.js"></script>
+</head>
+<body>
+
+<h1>Embed JSON Metadata into PDF</h1>
+
+<input type="file" id="pdfUploader" accept="application/pdf" />
+<input type="file" id="jsonUploader" accept="application/json" />
+<button id="embedMetadata">Embed Metadata and Download PDF</button>
+
+<h1>Extract JSON Metadata from PDF</h1>
+
+<input type="file" id="pdfExtractUploader" accept="application/pdf" />
+<button id="extractMetadata">Extract Metadata and Download JSON</button>
+
+<script>
+// Function to embed metadata
+async function embedMetadata(pdfBlob, jsonBlob) {
+    const pdfArrayBuffer = await pdfBlob.arrayBuffer();
+    const jsonText = await jsonBlob.text();
+
+    const pdfDoc = await PDFLib.PDFDocument.load(pdfArrayBuffer);
+    const metadataDict = pdfDoc.context.obj({
+        Type: 'Metadata',
+        Subtype: 'XML',
+        Data: jsonText
+    });
+    pdfDoc.catalog.set(PDFLib.PDFName.of('CustomMetadata'), metadataDict);
+
+    const pdfBytes = await pdfDoc.save();
+
+    const newPdfBlob = new Blob([pdfBytes], { type: 'application/pdf' });
+    const blobUrl = URL.createObjectURL(newPdfBlob);
+    const downloadLink = document.createElement('a');
+    downloadLink.href = blobUrl;
+    downloadLink.download = 'updated-pdf.pdf';
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+}
+
+// Function to extract metadata
+async function extractMetadata(pdfBlob) {
+    const pdfArrayBuffer = await pdfBlob.arrayBuffer();
+    const pdfDoc = await PDFLib.PDFDocument.load(pdfArrayBuffer);
+
+    const metadata = pdfDoc.catalog.lookup(PDFLib.PDFName.of('CustomMetadata'));
+
+    // If metadata is found and is the correct type, extract it
+    if (metadata && metadata.Data) {
+        const jsonText = metadata.Data;
+
+        const jsonBlob = new Blob([jsonText], { type: 'application/json' });
+        const blobUrl = URL.createObjectURL(jsonBlob);
+        const downloadLink = document.createElement('a');
+        downloadLink.href = blobUrl;
+        downloadLink.download = 'extracted-metadata.json';
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+    } else {
+        alert('No JSON metadata found in this PDF.');
+    }
+}
+
+document.getElementById('embedMetadata').addEventListener('click', () => {
+    const pdfInput = document.getElementById('pdfUploader');
+    const jsonInput = document.getElementById('jsonUploader');
+
+    if (!pdfInput.files[0] || !jsonInput.files[0]) {
+        alert('Please select both a PDF file and a JSON file.');
+        return;
+    }
+
+    embedMetadata(pdfInput.files[0], jsonInput.files[0]);
+});
+
+document.getElementById('extractMetadata').addEventListener('click', () => {
+    const pdfInput = document.getElementById('pdfExtractUploader');
+
+    if (!pdfInput.files[0]) {
+        alert('Please select a PDF file.');
+        return;
+    }
+
+    extractMetadata(pdfInput.files[0]);
+});
+</script>
+
+</body>
+</html>
