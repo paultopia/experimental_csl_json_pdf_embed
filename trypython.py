@@ -6,7 +6,7 @@ import PyPDF2
 def embed_json_into_pdf(pdf_filename, json_filename):
     # Read the JSON file
     with open(json_filename, 'r') as json_file:
-        json_data = json.load(json_file)
+        json_data = {'/citations': json_file.read()}
 
     # Read the PDF file
     with open(pdf_filename, 'rb') as pdf_file:
@@ -21,6 +21,7 @@ def embed_json_into_pdf(pdf_filename, json_filename):
 
         # Add the JSON data as metadata
         pdf_writer.add_metadata(json_data)
+        print("added metadata")
 
         # Write the modified content to a new file
         new_pdf_filename = 'modified_' + pdf_filename
@@ -29,13 +30,6 @@ def embed_json_into_pdf(pdf_filename, json_filename):
 
     return new_pdf_filename
 
-# Example usage
-#pdf_file = 'example.pdf'
-#json_file = 'metadata.json'
-#result = embed_json_into_pdf(pdf_file, json_file)
-#print(f"Modified PDF saved as: {result}")
-
-
 def extract_json_from_pdf(pdf_filename):
     # Read the PDF file
     with open(pdf_filename, 'rb') as pdf_file:
@@ -43,23 +37,13 @@ def extract_json_from_pdf(pdf_filename):
 
         # Extract metadata
         metadata = pdf_reader.metadata
+    return metadata.get('/citations')
 
-    # The metadata in PyPDF2 is returned as a dictionary with '/Key' format.
-    # We need to reformat it to a standard dictionary format.
-    cleaned_metadata = {key.lstrip('/'): value for key, value in metadata.items()}
+def test():
+    newname = embed_json_into_pdf('dummy.pdf', 'dummy.json')
+    print(newname)
+    extracted = extract_json_from_pdf(newname)
+    print(extracted)
 
-    # Assuming the JSON is stored under a specific key, for example, 'EmbeddedJSON'.
-    # If it's under a different key, you'll need to change the following line accordingly.
-    json_data = cleaned_metadata.get('EmbeddedJSON', None)
-
-    # Parse the JSON data if it exists
-    if json_data:
-        json_data = json.loads(json_data)
-        return json_data
-    else:
-        return "No JSON metadata found."
-
-# Example usage
-#pdf_file = 'modified_example.pdf'  # Replace with your PDF file name
-#extracted_json = extract_json_from_pdf(pdf_file)
-#print(extracted_json)
+if __name__ == '__main__':
+    test()
