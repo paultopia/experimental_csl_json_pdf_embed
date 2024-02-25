@@ -38,7 +38,7 @@
     <h1>coherentpdf.js example</h1>
     <p>first choose an xmp file</p>
     <p id="textfile"></p>
-    <input type="file" id="text-selector">
+    <input type="file" id="xmp-selector">
 
         <p>Now choose a PDF file, and this web page will use a web worker to rotate the file 10 degrees, and then prompt you to download it.</p>
     <p>This happens entirely within the browser.</p>
@@ -51,6 +51,25 @@
     <p>Producer: <b id="producer"></b></p>
   </body>
 
+ <!-- Extra upload: text file (currently xml) -->
+  <script>
+    var indata = function() {};
+  </script>
+    <script>
+      const xmpSelector = document.getElementById('xmp-selector');
+      xmpSelector.addEventListener('change', (event) => {
+        const xmpfileList = event.target.files;
+        const xmpreader = new FileReader();
+        xmpreader.addEventListener('load', (event) => {
+          const xmpresult = event.target.result;
+          // Do something with result
+          indata.xmp = xmpresult;
+         });
+        xmpreader.readAsArrayBuffer(xmpfileList[0]);
+      });
+    </script>
+
+  
   <!-- Machinery for the file upload process -->
   <script>
     var lib = function() {};
@@ -90,8 +109,9 @@ function ensureFooIsSet(timeout) {
 ensureFooIsSet(100000).then(function(){
     document.getElementById("progress").innerHTML = '(0/4) PDF File loaded from disc. Processing...';
     var arr = new Uint8Array(lib.foo);
+    var datafile = new Uint8Array(indata.xmp)
     var w = new Worker("pgtestworker.js");
-    w.postMessage({mtype: 'pdf', bytes: arr});
+    w.postMessage({mtype: 'pdf', bytes: arr, metadata: datafile});
     w.onmessage = function(e)
     {
       switch (e.data.mtype)
