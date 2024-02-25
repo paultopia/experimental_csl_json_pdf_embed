@@ -2,6 +2,8 @@
 <html>
   <!-- Load cpdf. We only use this for getting the version number. Everything else is done by the cpdfworker.js -->
   <script src="dist/coherentpdf.browser.js"></script>
+  <!-- load my functionality to do json xmp conversions-->
+  <script src="json_to_xmp.js"></script>
 
   <!-- Script for downloading the resultant file -->
   <script>
@@ -36,9 +38,9 @@
   <!-- The page itself -->
   <body>
     <h1>coherentpdf.js example</h1>
-    <p>first choose an xmp file</p>
+    <p>first choose a json file</p>
     <p id="textfile"></p>
-    <input type="file" id="xmp-selector">
+    <input type="file" id="json-selector">
 
         <p>Now choose a PDF file, and this web page will use a web worker to rotate the file 10 degrees, and then prompt you to download it.</p>
     <p>This happens entirely within the browser.</p>
@@ -51,21 +53,24 @@
     <p>Producer: <b id="producer"></b></p>
   </body>
 
- <!-- Extra upload: text file (currently xml) -->
+ <!-- Extra upload: text file (currently json) -->
   <script>
     var indata = function() {};
   </script>
     <script>
-      const xmpSelector = document.getElementById('xmp-selector');
-      xmpSelector.addEventListener('change', (event) => {
-        const xmpfileList = event.target.files;
-        const xmpreader = new FileReader();
-        xmpreader.addEventListener('load', (event) => {
-          const xmpresult = event.target.result;
-          // Do something with result
-          indata.xmp = xmpresult;
+      const jsonSelector = document.getElementById('json-selector');
+      jsonSelector.addEventListener('change', (event) => {
+        const jsonfileList = event.target.files;
+        const jsonreader = new FileReader();
+        jsonreader.addEventListener('load', (event) => {
+            const jsonresult = event.target.result;
+            // Do something with result
+            var myJson = jsonresult;
+	    const textEncoder = new TextEncoder();
+	    const xmpData = textEncoder.encode(myJson);
+	    indata.xmp = xmpData;
          });
-        xmpreader.readAsArrayBuffer(xmpfileList[0]);
+        jsonreader.readAsText(jsonfileList[0], "UTF-8");
       });
     </script>
 

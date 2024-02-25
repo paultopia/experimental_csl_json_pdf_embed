@@ -51,6 +51,6 @@ function extractJsonFromXMP(xmpString){
     return json;
 };
 
-foo = makeXMP(testJson);
-bar = extractJsonFromXMP(foo);
-console.log(bar);
+//foo = makeXMP(testJson);
+//bar = extractJsonFromXMP(foo);
+//console.log(bar);
