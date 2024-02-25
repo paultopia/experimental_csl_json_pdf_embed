@@ -10,7 +10,7 @@ Shove the base64 string into a single property basically
 --
 CURRENTLY
 - I can read xml file as xmp metadata and shove it into file, and then inspecting the file with cat shows it in there (though I need to pull out the metadata to make sure it's readable by the library)
-
+- UPDATE: I can read metadata and confirm that it's correct. 
 ---
 
 NEXT STEP: 

@@ -25,6 +25,10 @@ self.onmessage = function(e) {
        //Write the result to a PDF file as an array of bytes
        var mem = coherentpdf.toMemory(pdf, false, false);
        self.postMessage({mtype: 'progress', message: '(5/5) File serialized to memory...'});
+       var extractedMetadata = coherentpdf.getMetadata(pdf);
+       var decoder = new TextDecoder("utf-8");
+       var decodedMetadata = decoder.decode(extractedMetadata);
+       console.log(decodedMetadata);
        //Send the file back to index.html
        self.postMessage({mtype: 'pdfout', bytes: mem});
        //This worker will be terminated by index.html, so no need to call coherentpdf.deletePdf
