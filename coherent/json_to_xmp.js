@@ -13,15 +13,16 @@ const testJson = `
 
 // also not sure if this is fragile with some unicode characters??  see http://devdoc.net/web/developer.mozilla.org/en-US/docs/Web/JavaScript/Base64_encoding_and_decoding.html#Solution_2_–_rewrite_the_DOMs_atob()_and_btoa()_using_JavaScript's_TypedArrays_and_UTF-8  and http://devdoc.net/web/developer.mozilla.org/en-US/docs/Web/API/Window/btoa.html
 
-// FOR BROWSER
-var b64Json = window.btoa(testJson);
 
-// For Node
+function makeXMP(jsonString){
+    // FOR BROWSER VS NODE base64 functionality
+    if (typeof window !== 'undefined'){ //we're in a browser
+	var b64Json = window.btoa(testJson);
+    } else {
+	var b64Json = Buffer.from(jsonString).toString('base64');
+    }  
 
-//var b64Json = Buffer.from(testJson).toString('base64');
-
-var xmpString = `
-<x:xmpmeta xmlns:x="adobe:ns:meta/">
+    var xmpString =`<x:xmpmeta xmlns:x="adobe:ns:meta/">
 
   <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 	   xmlns:xmp="http://ns.adobe.com/xap/1.0/">
@@ -30,9 +31,26 @@ var xmpString = `
 
 <xmp:CSL>${b64Json}</xmp:CSL> </rdf:Description>
 
-</rdf:RDF> </x:xmpmeta>
+</rdf:RDF> </x:xmpmeta>`;
 
-`;
+    return xmpString;
+};
 
 
-console.log(xmpString);
+// console.log(makeXMP(testJson));
+
+function extractJsonFromXMP(xmpString){
+    // first use regex to get the base64 out of the xmp string
+    const pattern = /<xmp:CSL>(.*)<\/xmp:CSL>/;
+    const b64 = xmpString.match(pattern)[1];
+    if (typeof window !== 'undefined'){ // we're in a browser
+	var json = window.atob(b64);
+    } else {
+	var json = Buffer.from(b64, 'base64').toString('utf8');
+    } 
+    return json;
+};
+
+foo = makeXMP(testJson);
+bar = extractJsonFromXMP(foo);
+console.log(bar);
