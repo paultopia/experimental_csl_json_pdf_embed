@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+  <!-- Load cpdf. We only use this for getting the version number. Everything else is done by the cpdfworker.js -->
+  <script src="dist/coherentpdf.browser.js"></script>
+
+  <!-- Script for downloading the resultant file -->
+  <script>
+    function filedownload(data, filename, mime, bom) {
+    var blobData = (typeof bom !== 'undefined') ? [bom, data] : [data]
+    var blob = new Blob(blobData, {type: mime || 'application/octet-stream'});
+    if (typeof window.navigator.msSaveBlob !== 'undefined') {
+        window.navigator.msSaveBlob(blob, filename);
+    }
+    else {
+        var blobURL = (window.URL && window.URL.createObjectURL) ? window.URL.createObjectURL(blob) : window.webkitURL.createObjectURL(blob);
+        var tempLink = document.createElement('a');
+        tempLink.style.display = 'none';
+        tempLink.href = blobURL;
+        tempLink.setAttribute('download', filename);
+
+        if (typeof tempLink.download === 'undefined') {
+            tempLink.setAttribute('target', '_blank');
+        }
+
+        document.body.appendChild(tempLink);
+        tempLink.click();
+
+        setTimeout(function() {
+            document.body.removeChild(tempLink);
+            window.URL.revokeObjectURL(blobURL);
+        }, 200)
+    }
+}
+  </script>
+
+  <!-- The page itself -->
+  <body>
+    <h1>coherentpdf.js example</h1>
+    <p>Choose a PDF file, and this web page will use a web worker to rotate the file 10 degrees, and then prompt you to download it.</p>
+    <p>This happens entirely within the browser.</p>
+    <p id="demo"></p>
+    <input type="file" id="file-selector">
+    <p><i><b id="progress">Choose a file to begin...</b></i></p>
+    <h3>PDF Information</h3>
+    <p>Pages: <b id="pages"></b></p>
+    <p>Creator: <b id="creator"></b></p>
+    <p>Producer: <b id="producer"></b></p>
+  </body>
+
+  <!-- Machinery for the file upload process -->
+  <script>
+    var lib = function() {};
+  </script>
+    <script>
+      const fileSelector = document.getElementById('file-selector');
+      fileSelector.addEventListener('change', (event) => {
+        const fileList = event.target.files;
+        const reader = new FileReader();
+        reader.addEventListener('load', (event) => {
+          const result = event.target.result;
+          // Do something with result
+          lib.foo = result;
+         });
+        reader.readAsArrayBuffer(fileList[0]);
+      });
+    </script>
+  <!-- Main script. Start the worker and process messages from it. -->
+    <script>
+
+function ensureFooIsSet(timeout) {
+    var start = Date.now();
+    return new Promise(waitForFoo);
+ 
+    function waitForFoo(resolve, reject) {
+        if (window.lib && window.lib.foo)
+            resolve(window.lib.foo);
+        else if (timeout && (Date.now() - start) >= timeout)
+            reject(new Error("timeout"));
+        else
+            setTimeout(waitForFoo.bind(this, resolve, reject), 30);
+    }
+}
+
+      document.getElementById("demo").innerHTML = 'coherentpdf.js, loaded version: ' + coherentpdf.version();
+
+ensureFooIsSet(100000).then(function(){
+    document.getElementById("progress").innerHTML = '(0/4) PDF File loaded from disc. Processing...';
+    var arr = new Uint8Array(lib.foo);
+    var w = new Worker("cpdfworker.js");
+    w.postMessage({mtype: 'pdf', bytes: arr});
+    w.onmessage = function(e)
+    {
+      switch (e.data.mtype)
+      {
+        case 'pdfout':
+          filedownload(e.data.bytes, "download.pdf");
+          document.getElementById("progress").innerHTML = 'Processing finished. Output PDF file downloaded. Reload page to do another file.';
+          w.terminate();
+          break;
+        case 'progress':
+          document.getElementById("progress").innerHTML = e.data.message;
+          break;
+        case 'pages':
+          document.getElementById("pages").innerHTML = e.data.x;
+          break;
+        case 'creator':
+          document.getElementById("creator").innerHTML = e.data.x;
+          break;
+        case 'producer':
+          document.getElementById("producer").innerHTML = e.data.x;
+          break;
+      }
+    }
+});
+    </script>
+</html>
