@@ -66,8 +66,9 @@
             const jsonresult = event.target.result;
             // Do something with result
             var myJson = jsonresult;
+	    var asXMP = makeXMP(myJson);
 	    const textEncoder = new TextEncoder();
-	    const xmpData = textEncoder.encode(myJson);
+	    const xmpData = textEncoder.encode(asXMP);
 	    indata.xmp = xmpData;
          });
         jsonreader.readAsText(jsonfileList[0], "UTF-8");

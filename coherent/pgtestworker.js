@@ -29,7 +29,7 @@ self.onmessage = function(e) {
        var decoder = new TextDecoder("utf-8");
        var decodedMetadata = decoder.decode(extractedMetadata);
        console.log("about to print metadata");
-       //console.log(decodedMetadata);
+       console.log(decodedMetadata);
        //Send the file back to index.html
        self.postMessage({mtype: 'pdfout', bytes: mem});
        //This worker will be terminated by index.html, so no need to call coherentpdf.deletePdf
