@@ -36,7 +36,11 @@
   <!-- The page itself -->
   <body>
     <h1>coherentpdf.js example</h1>
-    <p>Choose a PDF file, and this web page will use a web worker to rotate the file 10 degrees, and then prompt you to download it.</p>
+    <p>first choose an xmp file</p>
+    <p id="textfile"></p>
+    <input type="file" id="text-selector">
+
+        <p>Now choose a PDF file, and this web page will use a web worker to rotate the file 10 degrees, and then prompt you to download it.</p>
     <p>This happens entirely within the browser.</p>
     <p id="demo"></p>
     <input type="file" id="file-selector">
@@ -86,7 +90,7 @@ function ensureFooIsSet(timeout) {
 ensureFooIsSet(100000).then(function(){
     document.getElementById("progress").innerHTML = '(0/4) PDF File loaded from disc. Processing...';
     var arr = new Uint8Array(lib.foo);
-    var w = new Worker("cpdfworker.js");
+    var w = new Worker("pgtestworker.js");
     w.postMessage({mtype: 'pdf', bytes: arr});
     w.onmessage = function(e)
     {
