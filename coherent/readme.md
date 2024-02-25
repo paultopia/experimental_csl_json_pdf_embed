@@ -26,6 +26,12 @@ Put into xml in right spot using some kind of string template
 Then encode to uint8 https://stackoverflow.com/questions/6965107/converting-between-strings-and-arraybuffers
 Then shove into file with existing code.
 
+## UPDATE: Json and B64 pipeline works
+
+(though it might be fragile, I'm a little concerned about if I get anything outside of utf-8 in the json file)
+
+now all I need to do is get functionality to save the JSON to a downloaded file, and a UI, and it's done.
+
 
 ----
 

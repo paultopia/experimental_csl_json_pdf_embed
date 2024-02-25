@@ -43,11 +43,13 @@ function extractJsonFromXMP(xmpString){
     // first use regex to get the base64 out of the xmp string
     const pattern = /<xmp:CSL>(.*)<\/xmp:CSL>/;
     const b64 = xmpString.match(pattern)[1];
-    if (typeof window !== 'undefined'){ // we're in a browser
-	var json = window.atob(b64);
-    } else {
-	var json = Buffer.from(b64, 'base64').toString('utf8');
-    } 
+    var json = atob(b64);
+    // window doesn't exist in wbe worker, not sure how to test
+//    if (typeof window !== 'undefined'){ // we're in a browser
+//	var json = window.atob(b64);
+//    } else {
+//	var json = Buffer.from(b64, 'base64').toString('utf8');
+//    } 
     return json;
 };
 

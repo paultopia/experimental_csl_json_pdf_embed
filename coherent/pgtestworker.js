@@ -1,4 +1,5 @@
 importScripts('dist/coherentpdf.browser.js')
+importScripts('json_to_xmp.js')
 
 self.onmessage = function(e) {
    switch (e.data.mtype)
@@ -28,8 +29,9 @@ self.onmessage = function(e) {
        var extractedMetadata = coherentpdf.getMetadata(pdf);
        var decoder = new TextDecoder("utf-8");
        var decodedMetadata = decoder.decode(extractedMetadata);
+       var jsonifiedMetadata = extractJsonFromXMP(decodedMetadata);
        console.log("about to print metadata");
-       console.log(decodedMetadata);
+       console.log(jsonifiedMetadata);
        //Send the file back to index.html
        self.postMessage({mtype: 'pdfout', bytes: mem});
        //This worker will be terminated by index.html, so no need to call coherentpdf.deletePdf
