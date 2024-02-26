@@ -60,7 +60,9 @@
     <script>
       const jsonSelector = document.getElementById('json-selector');
       jsonSelector.addEventListener('change', (event) => {
-        const jsonfileList = event.target.files;
+          const jsonfileList = event.target.files;
+	  const jsonFileName = jsonfileList[0].name;
+	  console.log(jsonFileName);
         const jsonreader = new FileReader();
         jsonreader.addEventListener('load', (event) => {
             const jsonresult = event.target.result;
@@ -70,6 +72,7 @@
 	    const textEncoder = new TextEncoder();
 	    const xmpData = textEncoder.encode(asXMP);
 	    indata.xmp = xmpData;
+	    indata.name = jsonFileName;
          });
         jsonreader.readAsText(jsonfileList[0], "UTF-8");
       });
@@ -83,14 +86,17 @@
     <script>
       const fileSelector = document.getElementById('file-selector');
       fileSelector.addEventListener('change', (event) => {
-        const fileList = event.target.files;
-        const reader = new FileReader();
-        reader.addEventListener('load', (event) => {
-          const result = event.target.result;
-          // Do something with result
-          lib.foo = result;
-         });
-        reader.readAsArrayBuffer(fileList[0]);
+          const fileList = event.target.files;
+	  const fileName = fileList[0].name;
+	  console.log(fileName);
+          const reader = new FileReader();
+          reader.addEventListener('load', (event) => {
+              const result = event.target.result;
+              // Do something with result
+              lib.foo = result;
+	      lib.name = fileName;
+          });
+          reader.readAsArrayBuffer(fileList[0]);
       });
     </script>
   <!-- Main script. Start the worker and process messages from it. -->
