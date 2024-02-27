@@ -30,8 +30,11 @@ self.onmessage = function(e) {
        var decoder = new TextDecoder("utf-8");
        var decodedMetadata = decoder.decode(extractedMetadata);
        var jsonifiedMetadata = extractJsonFromXMP(decodedMetadata);
-       console.log("about to print metadata");
-       console.log(jsonifiedMetadata);
+       //console.log("about to print metadata");
+       //console.log(jsonifiedMetadata);
+       console.log("sending metadata");
+       self.postMessage({mtype: 'dataExtracted', metadata: jsonifiedMetadata});
+       console.log("sending file");
        //Send the file back to index.html
        self.postMessage({mtype: 'pdfout', bytes: mem});
        //This worker will be terminated by index.html, so no need to call coherentpdf.deletePdf

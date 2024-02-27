@@ -72,7 +72,7 @@
 	    const textEncoder = new TextEncoder();
 	    const xmpData = textEncoder.encode(asXMP);
 	    indata.xmp = xmpData;
-	    indata.name = jsonFileName;
+	    indata.fileName = jsonFileName;
          });
         jsonreader.readAsText(jsonfileList[0], "UTF-8");
       });
@@ -94,7 +94,7 @@
               const result = event.target.result;
               // Do something with result
               lib.foo = result;
-	      lib.name = fileName;
+	      lib.fileName = fileName;
           });
           reader.readAsArrayBuffer(fileList[0]);
       });
@@ -121,7 +121,12 @@ function ensureFooIsSet(timeout) {
 ensureFooIsSet(100000).then(function(){
     document.getElementById("progress").innerHTML = '(0/4) PDF File loaded from disc. Processing...';
     var arr = new Uint8Array(lib.foo);
-    var datafile = new Uint8Array(indata.xmp)
+    var pdfName = lib.fileName;
+    var modifiedPdfName = `modified-${pdfName}`;
+    var metaDataName = indata.fileName;
+    console.log(pdfName);
+    console.log(metaDataName);
+    var datafile = new Uint8Array(indata.xmp);
     var w = new Worker("pgtestworker.js");
     w.postMessage({mtype: 'pdf', bytes: arr, metadata: datafile});
     w.onmessage = function(e)
@@ -129,10 +134,13 @@ ensureFooIsSet(100000).then(function(){
       switch (e.data.mtype)
       {
         case 'pdfout':
-          filedownload(e.data.bytes, "download.pdf");
+          filedownload(e.data.bytes, modifiedPdfName);
           document.getElementById("progress").innerHTML = 'Processing finished. Output PDF file downloaded. Reload page to do another file.';
           w.terminate();
           break;
+	case 'dataExtracted':
+	  filedownload(e.data.metadata, metaDataName, "text/plain");
+	  break;
         case 'progress':
           document.getElementById("progress").innerHTML = e.data.message;
           break;
