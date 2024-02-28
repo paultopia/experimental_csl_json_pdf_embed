@@ -191,7 +191,7 @@ extractSelector.addEventListener('change', (event) => {
     const extractReader = new FileReader();
     extractReader.addEventListener('load', (event) => {
         const extractResult = event.target.result;
-        extractState.pdf = result;
+        extractState.pdf = extractResult;
 	extractState.complete = true;
 	extractDataFromPDf()
     });
