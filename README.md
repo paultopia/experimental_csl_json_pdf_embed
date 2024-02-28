@@ -1,4 +1,11 @@
 # experimental_csl_json_pdf_embed
+
+## Update: cleaner code in new repository: 
+
+go here: https://github.com/paultopia/embed_metadata_in_pdf 
+
+## old readme
+
 experimental repo to embed CSL-JSON metadata into pdf files to make article references machine readable
 
 The code that actually works and is usable is in the extremely poorly named "clean_working" directory.  Everything else is garbage.  
