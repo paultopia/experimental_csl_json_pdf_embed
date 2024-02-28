@@ -173,14 +173,14 @@ embedSelector.addEventListener('change', (event) => {
     const embedReader = new FileReader();
     embedReader.addEventListener('load', (event) => {
         const embedResult = event.target.result;
-        embedState.pdf = result;
+        embedState.pdf = embedResult;
 	embedState.pdfFileName = embedName;
 	if (window.embedState.xmp){
 	    embedState.complete = true;
 	    embedDataInPDf();
 	}
     });
-    embedReader.readAsArrayBuffer(fileList[0]);
+    embedReader.readAsArrayBuffer(embedList[0]);
 });
 
 // hang event listener for extraction PDF file upload
@@ -195,6 +195,6 @@ extractSelector.addEventListener('change', (event) => {
 	extractState.complete = true;
 	extractDataFromPDf()
     });
-    extractReader.readAsArrayBuffer(fileList[0]);
+    extractReader.readAsArrayBuffer(extractList[0]);
 });
 
