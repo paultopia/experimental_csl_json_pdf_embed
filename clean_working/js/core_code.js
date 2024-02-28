@@ -1,5 +1,5 @@
 function makeXMP(jsonString, fileName){
-    var b64Json = window.btoa(testJson);
+    var b64Json = Base64.encode(jsonString);
     var xmpString =`<x:xmpmeta xmlns:x="adobe:ns:meta/">
 
   <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -18,7 +18,7 @@ function makeXMP(jsonString, fileName){
 function extractJsonFromXMP(xmpString){
     const citesPattern = /<xmp:CSL>(.*)<\/xmp:CSL>/;
     const b64 = xmpString.match(citesPattern)[1];
-    var json = atob(b64);
+    var json = Base64.decode(b64);
     const citesFileNamePattern = /<xmp:citeFile>(.*)<\/xmp:citeFile>/;
     const citesFileName = xmpString.match(citesFileNamePattern)[1];
     return {json: json, fileName: citesFileName};
@@ -169,7 +169,7 @@ citesSelector.addEventListener('change', (event) => {
 const embedSelector = document.getElementById('embed-selector');
 embedSelector.addEventListener('change', (event) => {
     const embedList = event.target.files;
-    const embedName = fileList[0].name;
+    const embedName = embedList[0].name;
     const embedReader = new FileReader();
     embedReader.addEventListener('load', (event) => {
         const embedResult = event.target.result;
